@@ -32,4 +32,9 @@ class User extends Authenticatable
         $hash = md5(strtolower(trim($this->email)));
         return "http://www.gravatar.com/avatar/$hash?s=$size";
     }
+
+    /*public function getAllUsers()
+    {
+        return self::all();
+    }*/
 }

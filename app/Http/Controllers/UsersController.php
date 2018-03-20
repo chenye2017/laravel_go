@@ -7,18 +7,31 @@ use App\Models\User;
 
 class UsersController extends Controller
 {
-    //
+    public function __construct()
+    {
+        $this->middleware('auth', [
+            'except'=>['show', 'create', 'store', 'index']
+        ]);
+
+        $this->middleware('guest', [
+           'only'=>['create']
+        ]);
+    }
+
+    //用户登录页面
     public function create()
     {
 
         return view('users.create');
     }
 
+    //用户详细信息展示
     public function show(User $user)
     {
         return view('users.show', compact('user'));
     }
 
+    //用户注册逻辑
     public function store(Request $request)
     {
         //验证数据的正确性
@@ -46,4 +59,43 @@ class UsersController extends Controller
 
         return ;
     }
+
+    //用户信息修改页面
+    public function edit(User $user)
+    {
+        //确定是否是当前用户
+        $this->authorize('update', $user);
+        return view('users.edit', compact('user'));
+    }
+
+    //用户信息修改逻辑
+    public function update(User $user, Request $request)
+    {
+        //确定是否是当前用户
+        $this->authorize('update', $user);
+
+        $this->validate($request, [
+           'name'=>'required|max:50',
+            'password'=>'nullable|confirmed|min:6'
+        ]);
+
+        //更新数据
+        $data = [];
+        $data['name'] = $request->name;
+        if ($request->password) {
+            $data['password'] = $request->password;
+        }
+        $user->update($data);
+
+        session()->flash('success', '更新个人资料成功');
+
+        return redirect()->route('users.show', $user);
+    }
+
+    public function index()
+    {
+        $users = User::all();
+        return view('users.index', compact('users'));
+    }
+
 }

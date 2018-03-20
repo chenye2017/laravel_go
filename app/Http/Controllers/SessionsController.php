@@ -7,13 +7,20 @@ use Illuminate\Support\Facades\Auth;
 
 class SessionsController extends Controller
 {
-    //登录页表单展示
+    public function __construct()
+    {
+        $this->middleware('guest',[
+           'only'=>['create']
+        ]);
+    }
+
+    //注册页表单展示
     public function create()
     {
         return view('sessions.create');
     }
 
-    //实际的登录逻辑
+    //实际的登录逻辑,用户登录
     public function store(Request $request)
     {
         //验证参数
@@ -26,13 +33,14 @@ class SessionsController extends Controller
         if (Auth::attempt($credentials, $request->has('remember'))) {
             session()->flash('success', '欢迎回来');
 
-            return redirect()->route('users.show', [Auth::user()]);
+            return redirect()->intended(route('users.show', [Auth::user()]));
         } else {
             session()->flash('danger', '邮箱和密码不匹配');
             return redirect()->back()->withInput();
         }
     }
 
+    //用户注销
     public function destroy()
     {
         Auth::logout();
