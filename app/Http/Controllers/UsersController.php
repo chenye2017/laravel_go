@@ -94,8 +94,16 @@ class UsersController extends Controller
 
     public function index()
     {
-        $users = User::all();
-        return view('users.index', compact('users'));
+        $users = User::paginate(10);
+        return view('users.index', ['users'=>$users]);
+    }
+
+    public function destroy(User $user)
+    {
+        $this->authorize('destroy', $user);
+        $user->delete();
+        Session()->flash('success', '删除用户成功');
+        return redirect('/users');
     }
 
 }

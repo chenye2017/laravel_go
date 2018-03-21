@@ -19,7 +19,10 @@ Route::get('/', 'StaticPagesController@home');
 Route::get('/about', 'StaticPagesController@about')->name('about');
 Route::get('/help', 'StaticPagesController@help')->name('help');
 
+//用户注册页面
 Route::get('/signup', 'UsersController@create')->name('signup');
+
+Route::delete('/users/{user}', 'UsersController@destory')->name('users.destroy');
 
 Route::resource('users', 'UsersController');
 
