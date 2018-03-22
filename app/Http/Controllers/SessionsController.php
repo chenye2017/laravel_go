@@ -40,7 +40,7 @@ class SessionsController extends Controller
             } else {
                 Auth::logout();
                 session()->flash('danger', '请先激活邮箱');
-                return redirect('/');
+                return redirect('/login')->withInput();
             }
         } else {
             session()->flash('danger', '邮箱和密码不匹配');

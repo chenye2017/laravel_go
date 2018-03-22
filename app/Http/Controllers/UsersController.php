@@ -12,7 +12,7 @@ class UsersController extends Controller
     public function __construct()
     {
         $this->middleware('auth', [
-            'except'=>['show', 'create', 'store', 'index']
+            'except'=>['show', 'create', 'store', 'index', 'confirmEmail', 'sendEmailConfirmationTo']
         ]);
 
         $this->middleware('guest', [
@@ -30,7 +30,12 @@ class UsersController extends Controller
     //用户详细信息展示
     public function show(User $user)
     {
-        return view('users.show', compact('user'));
+        //所有的微博
+        $statuses = $user->statuses()
+            ->orderBy('created_at', 'desc')
+            ->paginate(30);
+
+        return view('users.show', compact('user', 'statuses'));
     }
 
     //用户注册逻辑
@@ -51,7 +56,7 @@ class UsersController extends Controller
         ]);
 
         //保存成功信息
-        session()->flash('success', '欢迎，您将在这里开启一段新的旅程~');
+        session()->flash('success', '欢迎，您将在这里开启一段新的旅程~先去激活邮箱吧再来登陆');
 
         //实现登陆
         //Auth::login($user);
@@ -59,7 +64,7 @@ class UsersController extends Controller
         //发送邮件
 
         //重定向
-        return redirect()->route('users.show', [$user]);
+        return redirect()->route('login');
 
         return ;
     }
@@ -125,13 +130,13 @@ class UsersController extends Controller
     {
         $view = 'email.confirm';
         $data = compact('user');
-        $from = 'cy@1967196626.com';
+        $from = 'cy@1967196626.com'; //.env文件里面已经配置了
         $name = 'yufatang';
         $to = $user->email;
         $subject = "感谢注册 Sample 应用！请确认你的邮箱。";
 
         Mail::send($view, $data, function ($message) use ($from, $name, $to, $subject) {
-            $message->from($from, $name)->to($to)->subject($subject);
+            $message->to($to)->subject($subject);
         });
     }
 
