@@ -60,7 +60,47 @@ class User extends Authenticatable
     //根据倒叙取出该用户发的所有微博
     public function feed()
     {
-        return $this->statuses()
+        //所有关注的人
+        $followings = $this->following->pluck('id')->toArray();
+        array_push($followings, $this->id);
+        return Status::whereIn('user_id', $followings)
+            ->with('user')
             ->orderBy('created_at', 'desc');
+    }
+
+    //获取所有的粉丝
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'followers', 'user_id', 'follower_id');
+    }
+
+    //获取所有的追随者
+    public function following()
+    {
+        return $this->belongsToMany(User::class, 'followers', 'follower_id', 'user_id');
+    }
+
+    //关注别人
+    public function follow($users_id)
+    {
+        if (!is_array($users_id)) {
+            $users_id = compact('users_id');
+        }
+        $this->following()->sync($users_id, false);
+    }
+
+    //取消关注别人
+    public function unfollow($users_id)
+    {
+        if (!is_array($users_id)) {
+            $users_id = compact('users_id');
+        }
+        $this->following()->detach($users_id);
+    }
+
+    //我的关注者里面是否有这个人
+    public function isFollowing($user_id)
+    {
+        return $this->following()->get()->contains($user_id);
     }
 }

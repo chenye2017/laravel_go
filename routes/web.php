@@ -48,3 +48,15 @@ Route::post('/statuses', 'StatusesController@store')->name('statuses.store');
 
 //微博的删除
 Route::delete('/statuses/{status}', 'StatusesController@destroy')->name('statuses.destroy');
+
+//我关注的人
+Route::get('/users/{user}/followings', 'UsersController@followings')->name('users.followings');
+
+//我的粉丝
+Route::get('/users/{user}/followers', 'UsersController@followers')->name('users.followers');
+
+//关注
+Route::post('/users/followers/{user}', 'FollowersController@store')->name('followers.store');
+
+//取消关注
+Route::delete('/users/followers/{user}', 'FollowersController@destroy')->name('followers.destroy');
