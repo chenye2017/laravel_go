@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Mail;
 
 class SessionsController extends Controller
 {
@@ -32,9 +33,15 @@ class SessionsController extends Controller
 
         //是否匹配
         if (Auth::attempt($credentials, $request->has('remember'))) {
-            session()->flash('success', '欢迎回来');
+            if (Auth::user()->active_status) {
+                session()->flash('success', '欢迎回来');
 
-            return redirect()->intended(route('users.show', [Auth::user()]));
+                return redirect()->intended(route('users.show', [Auth::user()]));
+            } else {
+                Auth::logout();
+                session()->flash('danger', '请先激活邮箱');
+                return redirect('/');
+            }
         } else {
             session()->flash('danger', '邮箱和密码不匹配');
             return redirect()->back()->withInput();
@@ -48,4 +55,6 @@ class SessionsController extends Controller
         session()->flash('success', '退出成功');
         return redirect()->route('users.create');
     }
+
+
 }

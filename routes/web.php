@@ -29,3 +29,6 @@ Route::resource('users', 'UsersController');
 Route::post('login', 'SessionsController@store')->name('login');
 Route::get('login', 'SessionsController@create')->name('login');
 Route::delete('logout', 'SessionsController@destroy')->name('logout');
+
+//验证邮箱
+Route::get('/users/confirm/{token}', 'UsersController@confirmEmail')->name('confirm_email');
